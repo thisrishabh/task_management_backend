@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Task = require('../models/tasks');
 const ResUtil = require('../utils/res');
+const { AuthUtil } = require('../utils/auth');
 
-router.get('/', async (req, res) => {
+router.get('/', AuthUtil.authenticate, async (req, res) => {
     try {
         const data = await Task.aggregate([
             {
@@ -44,7 +45,7 @@ router.get('/', async (req, res) => {
     }
 })
 
-router.get('/user/:id', async (req, res) => {
+router.get('/user/:id', AuthUtil.authenticate, async (req, res) => {
     const userId = req.params.id;
     try {
         const data = await Task.aggregate([
@@ -91,7 +92,7 @@ router.get('/user/:id', async (req, res) => {
     }
 })
 
-router.post('/', async (req, res) => {
+router.post('/',AuthUtil.authenticate, async (req, res) => {
     try {
         if (!req.body) {
             return ResUtil.VALIDATION_ERROR(req, res, { message: 'task details is requried' }, 'VALIDATION_ERROR')
@@ -104,7 +105,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id',AuthUtil.authenticate, async (req, res) => {
     const taskId = req.params.id;
     try {
         const data = await Task.aggregate([
@@ -151,7 +152,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id',AuthUtil.authenticate, async (req, res) => {
     try {
         const data = await Task.findOneAndUpdate({id:req.params.id}, req.body, { new: true });
         if (!data) {
@@ -163,7 +164,7 @@ router.put('/:id', async (req, res) => {
       }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',AuthUtil.authenticate, async (req, res) => {
     try {
         const data = await Task.findOneAndDelete({id:req.params.id});
         if (!data) {
